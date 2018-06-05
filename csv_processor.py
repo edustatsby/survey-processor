@@ -11,10 +11,12 @@ def remove_duplicates(data):
             preprocessed.append(item)
     return preprocessed
 
+
 def schoolname_parser(schoolname):
     name = re.search(r"(?i).*?(Средняя школа|СШ|Школа|Лицей|Гимназия).*?", schoolname)
     number = re.search(r"(?i).*?(\d{1,3}|БНТУ|БГУ).*?", schoolname)
     return [name, number]  # ['school_type', 'school_number']
+
 
 def detect_school_type(passed_schools, school_number):
     school_types = defaultdict(int)
@@ -53,6 +55,7 @@ def measure_schools(school_list):  # school_list is list of tuples in form of (s
         else:  # means school[1] is "Ж"
             schools_dict[school[0]][1][1] += 1
     return schools_dict
+
 
 def categorize_schools(measured_schools):  # measured_school is {schoolname: [total_number_of_answers,
                                            # [number_of_male_answers, number_of_female_answers]]}
