@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import reduce
 import csv
 import re
 
@@ -65,9 +66,11 @@ def categorize_schools(measured_schools):  # measured_school is {schoolname: [to
 def write_output(enough, not_enough):
     with open("data/output.txt", "w", encoding="utf-8") as output:
         i = 1
-        output.write("              ENOUGH:             ")
+        total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)
+        output.write("TOTAL: {0}\n              ENOUGH:              ".format(total))
+        output
         for school in enough:  # school is ([total_number_of_answers,
-                                          # [number_of_male_answers, number_of_female_answers]], schoolname)
+            # [number_of_male_answers, number_of_female_answers]], schoolname)
             output.write("\n{0}. {1} - {2} {{M - {3}, Ж - {4}}}".format(i, school[1], school[0][0], school[0][1][0],
                                                                         school[0][1][1]))
             i += 1
