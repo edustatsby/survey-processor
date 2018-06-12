@@ -90,11 +90,13 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     reader = csv.reader(read)
 
     data = [row[1:] for row in reader][1:]  # deleting the first row because it represents columns' names
-                                            # deleting the first column because it represents date and time
+    #                                         deleting the first column because it represents date and time
 
     preprocessed_data = remove_duplicates(data)
 
     schools = [(row[26], row[0][0]) if row[26] else (row[2], row[0][0]) for row in preprocessed_data]
+
+    # corrected is list of tuples if form (schoolname, gender)
 
     schools = [school for school in schools if school[0] != ""]  # deleting items where schoolname is blank
 
