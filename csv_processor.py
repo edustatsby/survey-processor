@@ -1,5 +1,6 @@
 from collections import defaultdict
 from functools import reduce
+import itertools
 import csv
 import re
 
@@ -33,7 +34,7 @@ def correct_townnames(responses_list):
     with open("data/towns.csv", "r", newline="", encoding="utf-8") as towns_csv:
         towns_reader = csv.reader(towns_csv)
         towns_list_improper = [town for town in towns_reader]
-        towns_list = reduce(lambda x, y: x+y, towns_list_improper)
+        towns_list = list(itertools.chain.from_iterable(towns_list_improper))
         corrected = []
         for response in responses_list:
             town = response[2].lower()
@@ -115,11 +116,13 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
 
     responses = [(row[26], row[0][0], "Минск") if row[26] else (row[2], row[0][0], row[1]) for row in preprocessed_data]
 
-    # responses is list of tuples if form (schoolname, gender, town)
+    # responses is list of tuples in form (schoolname, gender, town)
 
-    corrected = correct_schoolnames(responses)  # corrected is list of tuples if form (schoolname, gender, town)
+    corrected = correct_schoolnames(responses)  # corrected is list of tuples in the format of
+    #                                                                                       (schoolname, gender, town)
 
-    fully_corrected = correct_townnames(corrected)
+    fully_corrected = correct_townnames(corrected)  # fully_corrected is list of tuples in the format of
+    #                                                                                       (schoolname, gender, town)
 
     measured_schools = measure_schools(corrected)
 
