@@ -29,23 +29,39 @@ def detect_school_type(passed_schools, school_number):
     return sorted_school_types[-1][1] if sorted_school_types else None
 
 
-def correct_schoolnames(school_list):  # school_list is list of tuples in form (schoolname, gender)
+def correct_townnames(responses_list):
+    with open("data/towns.csv", "r", newline="", encoding="utf-8") as towns_csv:
+        towns_reader = csv.reader(towns_csv)
+        towns_list_improper = [town for town in towns_reader]
+        towns_list = reduce(lambda x, y: x+y, towns_list_improper)
+        corrected = []
+        for response in responses_list:
+            town = response[2].lower()
+            for possible_town in towns_list:
+                possible_town = possible_town.strip().lower()
+                if possible_town in town:
+                    corrected.append((response[0], response[1], possible_town))
+        return corrected
+
+
+def correct_schoolnames(responses_list):  # school_list is list of tuples in form (schoolname, gender)
     final_list = []
-    for i in range(len(school_list)):
-        res = schoolname_parser(school_list[i][0])
+    for i in range(len(responses_list)):
+        res = schoolname_parser(responses_list[i][0])
         if res[0] and res[1]:
             if res[0][1].lower() == "средняя школа" or res[0][1].lower() == "сш":
-                final_list.append(("{0} {1}".format("Школа", res[1][1].upper()), school_list[i][1], school_list[i][2]))
+                final_list.append(("{0} {1}".format("Школа", res[1][1].upper()), responses_list[i][1],
+                                   responses_list[i][2]))
                 continue
             else:
-                final_list.append(("{0} {1}".format(res[0][1].capitalize(), res[1][1].upper()), school_list[i][1],
-                                   school_list[i][2]))
+                final_list.append(("{0} {1}".format(res[0][1].capitalize(), res[1][1].upper()), responses_list[i][1],
+                                   responses_list[i][2]))
                 continue
         if res[1]:
             found_type = detect_school_type(final_list[-20:], res[1][1])
             if found_type:
-                final_list.append(("{0} {1}".format(found_type, res[1][1].upper()), school_list[i][1],
-                                   school_list[i][2]))
+                final_list.append(("{0} {1}".format(found_type, res[1][1].upper()), responses_list[i][1],
+                                   responses_list[i][2]))
     return final_list
 
 
@@ -97,13 +113,13 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
 
     preprocessed_data = remove_duplicates(data)
 
-    schools = [(row[26], row[0][0], "Минск") if row[26] else (row[2], row[0][0], row[1]) for row in preprocessed_data]
+    responses = [(row[26], row[0][0], "Минск") if row[26] else (row[2], row[0][0], row[1]) for row in preprocessed_data]
 
-    # schools is list of tuples if form (schoolname, gender, town)
+    # responses is list of tuples if form (schoolname, gender, town)
 
-    schools = [school for school in schools if school[0] != ""]  # deleting items where schoolname is blank
+    corrected = correct_schoolnames(responses)  # corrected is list of tuples if form (schoolname, gender, town)
 
-    corrected = correct_schoolnames(schools)  # corrected is list of tuples if form (schoolname, gender, town)
+    fully_corrected = correct_townnames(corrected)
 
     measured_schools = measure_schools(corrected)
 
