@@ -40,8 +40,8 @@ def correct_townnames(responses_list):
             town = response[2].lower()
             for possible_town in towns_list:
                 possible_town = possible_town.strip().lower()
-                if possible_town in town:
-                    corrected.append((response[0], response[1], possible_town))
+                if town in possible_town and possible_town in town:
+                    corrected.append((response[0], response[1], possible_town.capitalize()))
         return corrected
 
 
@@ -66,14 +66,15 @@ def correct_schoolnames(responses_list):  # school_list is list of tuples in for
     return final_list
 
 
-def measure_schools(school_list):  # school_list is list of tuples in form of (schoolname, gender)
+def measure_schools(responses_list):  # school_list is list of tuples in form of (schoolname, gender)
     schools_dict = defaultdict(lambda: [0, [0, 0]])  # schools_dict is schoolname:
-    for school in school_list:  # [total_number_of_answers,
-        schools_dict[school[0]][0] += 1  # [number_of_male_answers, number_of_female_answers]]
-        if school[1] == "М":
-            schools_dict[school[0]][1][0] += 1
-        else:  # means school[1] is "Ж"
-            schools_dict[school[0]][1][1] += 1
+    for response in responses_list:                       # [total_number_of_answers,
+        schoolname_and_town = (response[0], response[2])  # [number_of_male_answers, number_of_female_answers]]
+        schools_dict[schoolname_and_town][0] += 1
+        if response[1] == "М":
+            schools_dict[schoolname_and_town][1][0] += 1
+        else:  # that means school[1] is "Ж"
+            schools_dict[schoolname_and_town][1][1] += 1
     return schools_dict
 
 
@@ -124,7 +125,9 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     fully_corrected = correct_townnames(corrected)  # fully_corrected is list of tuples in the format of
     #                                                                                       (schoolname, gender, town)
 
-    measured_schools = measure_schools(corrected)
+    measured_schools = measure_schools(fully_corrected)
+
+    print(measured_schools)
 
     enough, not_enough = categorize_schools(measured_schools)
 
