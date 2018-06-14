@@ -79,11 +79,12 @@ def measure_schools(responses_list):  # school_list is list of tuples in form of
 
 
 def categorize_schools(measured_schools):  # measured_school is {schoolname: [total_number_of_answers,
-    # [number_of_male_answers, number_of_female_answers]]}
+    #                                                           [number_of_male_answers, number_of_female_answers]]}
     enough = list(filter(lambda x: int(x[1][1][0]) >= 10 and int(x[1][1][1]) >= 10, measured_schools.items()))
     not_enough = list(filter(lambda x: int(x[1][1][0]) < 10 or int(x[1][1][1]) < 10, measured_schools.items()))
-    enough = [(numbers, name) for (name, numbers) in enough]  # this line and the next one are needed to
-    not_enough = [(numbers, name) for (name, numbers) in not_enough]  # correctly sort the list
+    enough = [(numbers, schoolname_and_town) for (schoolname_and_town, numbers) in enough]
+    # previous line and the next one are needed to correctly sort the list
+    not_enough = [(numbers, schoolname_and_town) for (schoolname_and_town, numbers) in not_enough]
     return sorted(enough)[::-1], sorted(not_enough)[::-1]
 
 
@@ -126,8 +127,6 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     #                                                                                       (schoolname, gender, town)
 
     measured_schools = measure_schools(fully_corrected)
-
-    print(measured_schools)
 
     enough, not_enough = categorize_schools(measured_schools)
 
