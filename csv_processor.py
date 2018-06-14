@@ -116,18 +116,19 @@ def write_output(enough, not_enough):
         i = 1
         total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)  # total number of responses
         output.write("TOTAL: {0}\n              ENOUGH:              ".format(total))
-        output
         for school in enough:  # school is ([total_number_of_answers,
             #                               [number_of_male_answers, number_of_female_answers]], schoolname)
-            output.write("\n{0}. {1} - {2} {{M - {3}, Ж - {4}}}".format(i, school[1], school[0][0], school[0][1][0],
-                                                                        school[0][1][1]))
+            output.write(
+                "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
+                                                                     school[0][1][0], school[0][1][1]))
             i += 1
         output.write("\n\n\n")
         i = 1
         output.write("              NOT ENOUGH:             ")
         for school in not_enough:
-            output.write("\n{0}. {1} - {2} {{M - {3}, Ж - {4}}}".format(i, school[1], school[0][0], school[0][1][0],
-                                                                        school[0][1][1]))
+            output.write(
+                "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
+                                                                     school[0][1][0], school[0][1][1]))
             i += 1
 
 
