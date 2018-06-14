@@ -8,7 +8,8 @@ def remove_duplicates(data):
     preprocessed = []
     for item in data:
         if item not in preprocessed:
-            preprocessed.append(item)
+            if item[26] or item[2]:
+                preprocessed.append(item)
     return preprocessed
 
 
@@ -34,15 +35,17 @@ def correct_schoolnames(school_list):  # school_list is list of tuples in form (
         res = schoolname_parser(school_list[i][0])
         if res[0] and res[1]:
             if res[0][1].lower() == "средняя школа" or res[0][1].lower() == "сш":
-                final_list.append(("{0} {1}".format("Школа", res[1][1].upper()), school_list[i][1]))
+                final_list.append(("{0} {1}".format("Школа", res[1][1].upper()), school_list[i][1], school_list[i][2]))
                 continue
             else:
-                final_list.append(("{0} {1}".format(res[0][1].capitalize(), res[1][1].upper()), school_list[i][1]))
+                final_list.append(("{0} {1}".format(res[0][1].capitalize(), res[1][1].upper()), school_list[i][1],
+                                   school_list[i][2]))
                 continue
         if res[1]:
             found_type = detect_school_type(final_list[-20:], res[1][1])
             if found_type:
-                final_list.append(("{0} {1}".format(found_type, res[1][1].upper()), school_list[i][1]))
+                final_list.append(("{0} {1}".format(found_type, res[1][1].upper()), school_list[i][1],
+                                   school_list[i][2]))
     return final_list
 
 
@@ -58,7 +61,7 @@ def measure_schools(school_list):  # school_list is list of tuples in form of (s
 
 
 def categorize_schools(measured_schools):  # measured_school is {schoolname: [total_number_of_answers,
-                                           # [number_of_male_answers, number_of_female_answers]]}
+    # [number_of_male_answers, number_of_female_answers]]}
     enough = list(filter(lambda x: int(x[1][1][0]) >= 10 and int(x[1][1][1]) >= 10, measured_schools.items()))
     not_enough = list(filter(lambda x: int(x[1][1][0]) < 10 or int(x[1][1][1]) < 10, measured_schools.items()))
     enough = [(numbers, name) for (name, numbers) in enough]  # this line and the next one are needed to
@@ -69,11 +72,11 @@ def categorize_schools(measured_schools):  # measured_school is {schoolname: [to
 def write_output(enough, not_enough):
     with open("data/output.txt", "w", encoding="utf-8") as output:
         i = 1
-        total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)
+        total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)  # total number of responses
         output.write("TOTAL: {0}\n              ENOUGH:              ".format(total))
         output
         for school in enough:  # school is ([total_number_of_answers,
-            # [number_of_male_answers, number_of_female_answers]], schoolname)
+            #                               [number_of_male_answers, number_of_female_answers]], schoolname)
             output.write("\n{0}. {1} - {2} {{M - {3}, Ж - {4}}}".format(i, school[1], school[0][0], school[0][1][0],
                                                                         school[0][1][1]))
             i += 1
@@ -94,13 +97,13 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
 
     preprocessed_data = remove_duplicates(data)
 
-    schools = [(row[26], row[0][0]) if row[26] else (row[2], row[0][0]) for row in preprocessed_data]
+    schools = [(row[26], row[0][0], "Минск") if row[26] else (row[2], row[0][0], row[1]) for row in preprocessed_data]
 
-    # corrected is list of tuples if form (schoolname, gender)
+    # schools is list of tuples if form (schoolname, gender, town)
 
     schools = [school for school in schools if school[0] != ""]  # deleting items where schoolname is blank
 
-    corrected = correct_schoolnames(schools)
+    corrected = correct_schoolnames(schools)  # corrected is list of tuples if form (schoolname, gender, town)
 
     measured_schools = measure_schools(corrected)
 
