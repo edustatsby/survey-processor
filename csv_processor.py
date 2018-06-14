@@ -20,6 +20,25 @@ def schoolname_parser(schoolname):
     return [name, number]  # ['school_type', 'school_number']
 
 
+def townname_parser(townname, towns_list):
+    matcher = re.search(r"^(.*?[.\-,]*?.*?)([\s\w]*)$", townname)
+    town = matcher[2].strip()
+    if matcher[2].title() in towns_list:
+        return matcher[2]
+    else:
+        possible_townnames = townname.split()
+        for i in range(len(possible_townnames)):
+            possible_townnames[i] = "".join(filter(str.isalpha, possible_townnames[i]))
+        possible_townnames = [townname for townname in possible_townnames if townname is not ""]
+        if not possible_townnames:
+            return ""
+        for possible_town in possible_townnames:
+            for town in towns_list:
+                town = town.lower().strip()
+                if town in possible_town and possible_town in town:
+                    return possible_town
+
+
 def detect_school_type(passed_schools, school_number):
     school_types = defaultdict(int)
     for school in passed_schools:
@@ -37,11 +56,15 @@ def correct_townnames(responses_list):
         towns_list = list(itertools.chain.from_iterable(towns_list_improper))
         corrected = []
         for response in responses_list:
-            town = response[2].lower()
+            town_raw = response[2].lower().strip()
+            town = townname_parser(town_raw, towns_list)
+            if not town:
+                continue
             for possible_town in towns_list:
                 possible_town = possible_town.strip().lower()
                 if town in possible_town and possible_town in town:
                     corrected.append((response[0], response[1], possible_town.capitalize()))
+                    break
         return corrected
 
 
@@ -68,7 +91,7 @@ def correct_schoolnames(responses_list):  # school_list is list of tuples in for
 
 def measure_schools(responses_list):  # school_list is list of tuples in form of (schoolname, gender)
     schools_dict = defaultdict(lambda: [0, [0, 0]])  # schools_dict is schoolname:
-    for response in responses_list:                       # [total_number_of_answers,
+    for response in responses_list:  # [total_number_of_answers,
         schoolname_and_town = (response[0], response[2])  # [number_of_male_answers, number_of_female_answers]]
         schools_dict[schoolname_and_town][0] += 1
         if response[1] == "М":
@@ -133,5 +156,4 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     write_output(enough, not_enough)
 
     #  to do:
-    #  1. cities categorization
-    #  2. гимназия-колледж искусств
+    #  1. гимназия-колледж искусств
