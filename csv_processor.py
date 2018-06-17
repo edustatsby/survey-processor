@@ -101,8 +101,8 @@ def measure_schools(responses_list):  # school_list is list of tuples in form of
     return schools_dict
 
 
-def categorize_schools(measured_schools):  # measured_school is {schoolname: [total_number_of_answers,
-    #                                                           [number_of_male_answers, number_of_female_answers]]}
+def categorize_schools(measured_schools):  # measured_school is dict in the format of (schoolname, city):
+    #                       [total_number_of_answers, [number_of_male_answers, number_of_female_answers]]
     enough = list(filter(lambda x: int(x[1][1][0]) >= 10 and int(x[1][1][1]) >= 10, measured_schools.items()))
     not_enough = list(filter(lambda x: int(x[1][1][0]) < 10 or int(x[1][1][1]) < 10, measured_schools.items()))
     enough = [(numbers, schoolname_and_town) for (schoolname_and_town, numbers) in enough]
@@ -111,7 +111,8 @@ def categorize_schools(measured_schools):  # measured_school is {schoolname: [to
     return sorted(enough)[::-1], sorted(not_enough)[::-1]
 
 
-def write_output(enough, not_enough):
+def write_output(enough, not_enough):  # enough (not_enough) is list of tuples in the format of
+    #                ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
     with open("data/output.txt", "w", encoding="utf-8") as output:
         i = 1
         total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)  # total number of responses
@@ -158,9 +159,11 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     fully_corrected = correct_townnames(corrected)  # fully_corrected is list of tuples in the format of
     #                                                                                       (schoolname, gender, town)
 
-    measured_schools = measure_schools(fully_corrected)
+    measured_schools = measure_schools(fully_corrected)  # measured_school is dict in the format of (schoolname, city):
+    #                                     [total_number_of_answers, [number_of_male_answers, number_of_female_answers]]
 
-    enough, not_enough = categorize_schools(measured_schools)
+    enough, not_enough = categorize_schools(measured_schools)  # enough (not_enough) is list of tuples in the format of
+    #               ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
 
     write_output(enough, not_enough)
 
