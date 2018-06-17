@@ -111,7 +111,7 @@ def categorize_schools(measured_schools):  # measured_school is dict in the form
     return sorted(enough)[::-1], sorted(not_enough)[::-1]
 
 
-def write_output(enough, not_enough):  # enough (not_enough) is list of tuples in the format of
+def write_output(enough, not_enough, difference):  # enough (not_enough) is list of tuples in the format of
     #                ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
     with open("data/output.txt", "w", encoding="utf-8") as output:
         i = 1
@@ -131,6 +131,12 @@ def write_output(enough, not_enough):  # enough (not_enough) is list of tuples i
                 "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
                                                                      school[0][1][0], school[0][1][1]))
             i += 1
+        if difference:  # difference is list of tuples in the format of
+            output.write("\n\n\n")  # ((schoolname, town), [total_difference, [male_difference, female_difference]])
+            output.write("              PROGRESS MADE             ")
+            for school_progress in difference:
+                output.write("\n({0}) {1} - PLUS {2} {{М - {3}, Ж - {4}}}".format(school_progress[0][1],
+                      school_progress[0][0], school_progress[1][0], school_progress[1][1][0], school_progress[1][1][1]))
 
 
 def calculate_progress(current_schools):
@@ -175,15 +181,10 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     measured_schools = measure_schools(fully_corrected)  # measured_school is dict in the format of (schoolname, city):
     #                                     [total_number_of_answers, [number_of_male_answers, number_of_female_answers]]
 
-    # for key, value in measured_schools.items():
-    #     print(key, value)
-
     difference = calculate_progress(measured_schools)  # difference is list of tuples in the format of
     #                                  ((schoolname, town), [total_difference, [male_difference, female_difference]])
-
-    print(difference)
 
     enough, not_enough = categorize_schools(measured_schools)  # enough (not_enough) is list of tuples in the format of
     #               ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
 
-    write_output(enough, not_enough)
+    write_output(enough, not_enough, difference)
