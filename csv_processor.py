@@ -15,8 +15,8 @@ def remove_duplicates(data):
 
 
 def schoolname_parser(schoolname):
-    name = re.search(r"(?i).*?(Средняя школа|СШ|Школа|Лицей|Гимназия).*?", schoolname)
-    number = re.search(r"(?i).*?(\d{1,3}|БНТУ|БГУ).*?", schoolname)
+    name = re.search(r"(?i).*?(Средняя школа|СШ|Школа|Лицей|Гимназия).*", schoolname)
+    number = re.search(r"(?i).*?(\d{1,3}|БНТУ|БГУ).*", schoolname)
     return [name, number]  # ['school_type', 'school_number']
 
 
