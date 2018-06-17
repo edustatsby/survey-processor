@@ -131,11 +131,13 @@ def write_output(enough, not_enough, difference):  # enough (not_enough) is list
                 "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
                                                                      school[0][1][0], school[0][1][1]))
             i += 1
-        if difference:  # difference is list of tuples in the format of
-            output.write("\n\n\n")  # ((schoolname, town), [total_difference, [male_difference, female_difference]])
+        if difference:  # difference is list of tuples in the format of # ((schoolname, town), [total_difference,
+            total_diff = reduce(lambda acc, x: acc + x[1][0], difference, 0)  # [male_difference, female_difference]])
+            output.write("\n\n\n")
             output.write("              PROGRESS MADE             ")
+            output.write("\nTOTAL: {0}".format(total_diff))
             for school_progress in difference:
-                output.write("\n({0}) {1} - PLUS {2} {{М - {3}, Ж - {4}}}".format(school_progress[0][1],
+                output.write("\n({0}) {1} - PLUS {2} (М - {3}, Ж - {4})".format(school_progress[0][1],
                       school_progress[0][0], school_progress[1][0], school_progress[1][1][0], school_progress[1][1][1]))
 
 
