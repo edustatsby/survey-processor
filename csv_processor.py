@@ -91,7 +91,7 @@ def correct_schoolnames(responses_list):  # school_list is list of tuples in for
 
 def measure_schools(responses_list):  # school_list is list of tuples in form of (schoolname, gender)
     schools_dict = defaultdict(lambda: [0, [0, 0]])  # schools_dict is schoolname:
-    for response in responses_list:  # [total_number_of_answers,
+    for response in responses_list:                       # [total_number_of_answers,
         schoolname_and_town = (response[0], response[2])  # [number_of_male_answers, number_of_female_answers]]
         schools_dict[schoolname_and_town][0] += 1
         if response[1] == "М":
@@ -132,13 +132,29 @@ def write_output(enough, not_enough):  # enough (not_enough) is list of tuples i
                                                                      school[0][1][0], school[0][1][1]))
             i += 1
 
-# def calculate_progress():
-#     with open("data/output.txt", "r", encoding="utf-8") as previous_output:
-#         content_raw = previous_output.readlines()
-#         content = list(map(lambda x: x[4:].strip(), filter(lambda x: "{" in x, content_raw)))
-#         print(content)
-#         for line in content:
-#             match = re.search(r"\(?(.*?)\)?\s(.*?)\s-\s(\d+).*?-\s(\d+).*?-\s(\d+)", line)
+
+def calculate_progress(current_schools):
+    with open("data/output.txt", "r", encoding="utf-8") as previous_output:
+        content_raw = previous_output.readlines()
+        content = list(map(lambda x: x[4:].strip(), filter(lambda x: "{" in x, content_raw)))
+        previous_schools = defaultdict(lambda: [0, [0, 0]])
+        for line in content:
+            match = re.search(r"\(?(.*?)\)?\s(.*?)\s-\s(\d+).*?-\s(\d+).*?-\s(\d+)", line)
+            previous_schools[(match[2], match[1])] = [int(match[3]), [int(match[4]), int(match[5])]]
+        progress_counter = []
+        print(previous_schools)
+        for schoolname_and_town in current_schools.keys():
+            print(previous_schools[schoolname_and_town])
+            print(current_schools[schoolname_and_town])
+            if current_schools[schoolname_and_town] != previous_schools[schoolname_and_town]:
+                total_diff = int(current_schools[schoolname_and_town][0]) - \
+                             int(previous_schools[schoolname_and_town][0])
+                male_diff = int(current_schools[schoolname_and_town][1][0]) - \
+                            int(previous_schools[schoolname_and_town][1][0])
+                female_diff = int(current_schools[schoolname_and_town][1][1]) - \
+                              int(previous_schools[schoolname_and_town][1][1])
+                progress_counter.append([schoolname_and_town, [total_diff, [male_diff, female_diff]]])
+        return progress_counter
 
 
 with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
@@ -161,6 +177,10 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
 
     measured_schools = measure_schools(fully_corrected)  # measured_school is dict in the format of (schoolname, city):
     #                                     [total_number_of_answers, [number_of_male_answers, number_of_female_answers]]
+
+    diff = calculate_progress(measured_schools)
+
+    print(diff)
 
     enough, not_enough = categorize_schools(measured_schools)  # enough (not_enough) is list of tuples in the format of
     #               ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
