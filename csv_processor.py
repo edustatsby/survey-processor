@@ -134,6 +134,10 @@ def write_output(enough, not_enough):
 # def calculate_progress():
 #     with open("data/output.txt", "r", encoding="utf-8") as previous_output:
 #         content_raw = previous_output.readlines()
+#         content = list(map(lambda x: x[4:].strip(), filter(lambda x: "{" in x, content_raw)))
+#         print(content)
+#         for line in content:
+#             match = re.search(r"\(?(.*?)\)?\s(.*?)\s-\s(\d+).*?-\s(\d+).*?-\s(\d+)", line)
 
 
 with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
