@@ -131,6 +131,10 @@ def write_output(enough, not_enough):
                                                                      school[0][1][0], school[0][1][1]))
             i += 1
 
+# def calculate_progress():
+#     with open("data/output.txt", "r", encoding="utf-8") as previous_output:
+#         content_raw = previous_output.readlines()
+
 
 with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     reader = csv.reader(read)
