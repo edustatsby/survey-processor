@@ -113,8 +113,8 @@ def categorize_schools(measured_schools):  # measured_school is dict in the form
     return sorted(enough)[::-1], sorted(not_enough)[::-1]
 
 
-def write_output(enough, not_enough, diff, current_time):  # enough (not_enough) is list of tuples in the format of
-    #                ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
+def write_output(enough, not_enough, diff, current_time, previous_time):  # enough (not_enough) is list of tuples in
+    # the format of ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
     open("data/output.txt", 'w').close()
     with open("data/output.txt", "r+", encoding="utf-8") as output:
         if len(current_time) == 4:
@@ -143,7 +143,7 @@ def write_output(enough, not_enough, diff, current_time):  # enough (not_enough)
         # difference is list of tuples in the format of # ((schoolname, town), [total_difference,
         total_diff = reduce(lambda acc, x: acc + x[1][0], difference, 0)  # [male_difference, female_difference]])
         output.write("\n\n\n")
-        output.write("              PROGRESS MADE SINCE               ")
+        output.write("-----Progress Made Since {0}-----".format(previous_time))
         output.write("\nTOTAL: {0}".format(total_diff))
         for school_progress in diff:
             output.write("\n({0}) {1} - PLUS {2} (М - {3}, Ж - {4})".format(school_progress[0][1],
@@ -159,6 +159,11 @@ def get_current_time():
     if now.minute <= 15:
         return now.month, now.day, now.hour
     print("get_current_time error")
+
+def get_previous_time():
+    with open("data/output.txt", "r", encoding="utf-8") as previous_output:
+        previous_time = previous_output.readline()
+        return previous_time
 
 
 def calculate_progress(current_schools):
@@ -211,6 +216,8 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
 
     current_time = get_current_time()
 
-    print(current_time)
+    previous_time = get_previous_time().strip()
 
-    write_output(enough, not_enough, difference, current_time)
+    print(previous_time)
+
+    write_output(enough, not_enough, difference, current_time, previous_time)
