@@ -2,6 +2,7 @@ from collections import defaultdict
 from functools import reduce
 import pandas as pd
 import itertools
+import calendar
 import csv
 import re
 
@@ -115,6 +116,12 @@ def categorize_schools(measured_schools):  # measured_school is dict in the form
 def write_output(enough, not_enough, difference, current_time):  # enough (not_enough) is list of tuples in the format of
     #                ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
     with open("data/output.txt", "w", encoding="utf-8") as output:
+        if len(current_time) == 4:
+            month, day, hour, minute = current_time
+            output.write("{0} {1}, {2}:{3}".format(month, day, hour, minute))
+        elif len(current_time) == 3:
+            month, day, hour = current_time
+            output.write("{0} {1}, {2}:00".format(month, day, hour))
         i = 1
         total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)  # total number of responses
         output.write("TOTAL: {0}\n              ENOUGH             ".format(total))
@@ -145,11 +152,11 @@ def write_output(enough, not_enough, difference, current_time):  # enough (not_e
 def get_current_time():
     now = pd.datetime.now()
     if 15 < now.minute < 45:
-        return now.day, now.hour, 30
+        return now.month, now.day, now.hour, 30
     if now.minute >= 45:
-        return now.day, now.hour+1
+        return now.month, now.day, now.hour+1
     if now.minute <= 15:
-        return now.day, now.hour
+        return now.month, now.day, now.hour
     print("get_current_time error")
 
 
@@ -202,5 +209,7 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     #               ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
 
     current_time = get_current_time()
+
+    print(current_time)
 
     write_output(enough, not_enough, difference, current_time)
