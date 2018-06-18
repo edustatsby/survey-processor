@@ -158,7 +158,7 @@ def get_current_time():
         return now.month, now.day, now.hour+1
     if now.minute <= 15:
         return now.month, now.day, now.hour
-    print("get_current_time error")
+
 
 def get_previous_time():
     with open("data/output.txt", "r", encoding="utf-8") as previous_output:
@@ -217,7 +217,5 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     current_time = get_current_time()
 
     previous_time = get_previous_time().strip()
-
-    print(previous_time)
 
     write_output(enough, not_enough, difference, current_time, previous_time)
