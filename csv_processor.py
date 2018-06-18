@@ -1,5 +1,6 @@
 from collections import defaultdict
 from functools import reduce
+import pandas as pd
 import itertools
 import csv
 import re
@@ -111,7 +112,7 @@ def categorize_schools(measured_schools):  # measured_school is dict in the form
     return sorted(enough)[::-1], sorted(not_enough)[::-1]
 
 
-def write_output(enough, not_enough, difference):  # enough (not_enough) is list of tuples in the format of
+def write_output(enough, not_enough, difference, current_time):  # enough (not_enough) is list of tuples in the format of
     #                ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
     with open("data/output.txt", "w", encoding="utf-8") as output:
         i = 1
@@ -131,14 +132,25 @@ def write_output(enough, not_enough, difference):  # enough (not_enough) is list
                 "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
                                                                      school[0][1][0], school[0][1][1]))
             i += 1
-        if difference:  # difference is list of tuples in the format of # ((schoolname, town), [total_difference,
-            total_diff = reduce(lambda acc, x: acc + x[1][0], difference, 0)  # [male_difference, female_difference]])
-            output.write("\n\n\n")
-            output.write("              PROGRESS MADE             ")
-            output.write("\nTOTAL: {0}".format(total_diff))
-            for school_progress in difference:
-                output.write("\n({0}) {1} - PLUS {2} (М - {3}, Ж - {4})".format(school_progress[0][1],
-                      school_progress[0][0], school_progress[1][0], school_progress[1][1][0], school_progress[1][1][1]))
+        # difference is list of tuples in the format of # ((schoolname, town), [total_difference,
+        total_diff = reduce(lambda acc, x: acc + x[1][0], difference, 0)  # [male_difference, female_difference]])
+        output.write("\n\n\n")
+        output.write("              PROGRESS MADE             ")
+        output.write("\nTOTAL: {0}".format(total_diff))
+        for school_progress in difference:
+            output.write("\n({0}) {1} - PLUS {2} (М - {3}, Ж - {4})".format(school_progress[0][1],
+                  school_progress[0][0], school_progress[1][0], school_progress[1][1][0], school_progress[1][1][1]))
+
+
+def get_current_time():
+    now = pd.datetime.now()
+    if 15 < now.minute < 45:
+        return now.day, now.hour, 30
+    if now.minute >= 45:
+        return now.day, now.hour+1
+    if now.minute <= 15:
+        return now.day, now.hour
+    print("get_current_time error")
 
 
 def calculate_progress(current_schools):
@@ -189,4 +201,6 @@ with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
     enough, not_enough = categorize_schools(measured_schools)  # enough (not_enough) is list of tuples in the format of
     #               ([total_number_of_answers, [number_of_male_answers, number_of_female_answers]], (schoolname, city))
 
-    write_output(enough, not_enough, difference)
+    current_time = get_current_time()
+
+    write_output(enough, not_enough, difference, current_time)
