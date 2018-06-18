@@ -119,10 +119,10 @@ def write_output(enough, not_enough, diff, current_time):  # enough (not_enough)
     with open("data/output.txt", "r+", encoding="utf-8") as output:
         if len(current_time) == 4:
             month, day, hour, minute = current_time
-            output.write("{0} {1}, {2}:{3}\n".format(month, day, hour, minute))
+            output.write("{0} {1}, {2}:{3}\n".format(calendar.month_name[month], day, hour, minute))
         elif len(current_time) == 3:
             month, day, hour = current_time
-            output.write("{0} {1}, {2}:00\n".format(month, day, hour))
+            output.write("{0} {1}, {2}:00\n".format(calendar.month_name[month], day, hour))
         i = 1
         total = reduce(lambda acc, x: acc + x[0][0], enough + not_enough, 0)  # total number of responses
         output.write("TOTAL: {0}\n              ENOUGH             ".format(total))
@@ -139,7 +139,7 @@ def write_output(enough, not_enough, diff, current_time):  # enough (not_enough)
             output.write(
                 "\n{0}. ({1}) {2} - {3} {{M - {4}, Ж - {5}}}".format(i, school[1][1], school[1][0], school[0][0],
                                                                      school[0][1][0], school[0][1][1]))
-            i += 1c
+            i += 1
         # difference is list of tuples in the format of # ((schoolname, town), [total_difference,
         total_diff = reduce(lambda acc, x: acc + x[1][0], difference, 0)  # [male_difference, female_difference]])
         output.write("\n\n\n")
