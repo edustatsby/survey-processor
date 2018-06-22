@@ -103,7 +103,7 @@ def measure_schools(responses_list):  # school_list is list of tuples in form of
     return schools_dict
 
 
-def categorize_schools(measured_schools):  # measured_school is dict in the format of (schoolname, city):
+def categorize_schools(measured_schools):  # measured_schools is dict in the format of (schoolname, city):
     #                       [total_number_of_answers, [number_of_male_answers, number_of_female_answers]]
     enough = list(filter(lambda x: int(x[1][1][0]) >= 10 and int(x[1][1][1]) >= 10, measured_schools.items()))
     not_enough = list(filter(lambda x: int(x[1][1][0]) < 10 or int(x[1][1][1]) < 10, measured_schools.items()))
@@ -184,7 +184,7 @@ def calculate_progress(current_schools):
                 female_diff = int(current_schools[schoolname_and_town][1][1]) - \
                               int(previous_schools[schoolname_and_town][1][1])
                 progress_counter.append((schoolname_and_town, [total_diff, [male_diff, female_diff]]))
-        return progress_counter
+        return sorted(progress_counter)[::-1]
 
 
 with open("data/survey.csv", "r", newline="", encoding="utf-8") as read:
